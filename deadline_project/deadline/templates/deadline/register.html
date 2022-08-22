@@ -1,0 +1,31 @@
+{% extends "deadline/base.html"  %}
+
+{% block navs %}
+{% for name,url in navlist.items %}
+<a class="navbar-brand" id="links" href="{% url url%}">{{ name }}</a>
+{% endfor %}
+{% endblock %}
+
+{% block content %}
+<div class="container" id="register">
+  <h1>REGISTER</h1>
+  <form action="{% url 'landing' %}" method="post">
+    {% csrf_token %}
+    <div class="col">
+      <div class="form" id="register">
+        {% for field in form %}
+        <div class="field">
+          <div class="label">
+            {{field.label}}:
+          </div>
+          <div class="input">
+            {{field}}
+          </div>
+        </div>
+        {% endfor %}
+        <input class="btn btn-success" type="submit" value="Submit">
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

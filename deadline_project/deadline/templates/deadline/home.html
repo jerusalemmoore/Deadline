@@ -1,0 +1,29 @@
+{% extends "deadline/base.html" %}
+{% block navs %}
+{% for name,url in navlist.items %}
+<a class="navbar-brand" id="links" href="{% url url%}">{{ name }}</a>
+{% endfor %}
+{%endblock%}
+{%block content%}
+<div class="center">
+  <div class="column">
+    <div>
+      <h1>HOME</h1>
+    </div>
+    <div class="grid">
+      {% for label in buttonLabels %}
+      <button class="button">{{label}}</button>
+      {% endfor %}
+    </div>
+
+    <!-- <div class="flexitem">
+            <button class="button">HOME</button>
+          </div> -->
+    <div class="grid" id="lists">
+      <div class="container">
+        list
+      </div>
+    </div>
+  </div>
+</div>
+{%endblock%}

@@ -1,0 +1,32 @@
+{% extends "deadline/base.html" %}
+{% block navs %}
+{% for name,url in navlist.items %}
+<a class="navbar-brand" id="links" href="{% url url%}">{{ name }}</a>
+{% endfor %}
+{% endblock %}
+{% block content %}
+<div class="container" id="about">
+  <div class="portrait">
+    {% load static %}
+    <img src="{% static 'deadline/images/profile.jpg' %}">
+  </div>
+  <div class="container" id="bio">
+    <h2>Programmer:</h2>
+    <h3>{{author}}</h3>
+    <p>{{school}}
+      <br>
+      {{degree}}
+    </p>
+    <p>My LinkedIn:
+      <br>
+      <a href="{{linkedin}}">{{linkedin}}</a>
+    </p>
+    <p>My Github:<br>
+      <a href="{{github}}">{{github}}</a>
+    </p>
+    <p>{{mission}}</p>
+    <p>{{goal}}</p>
+    <p>{{contact}}</p>
+  </div>
+</div>
+{% endblock %}
