@@ -20,39 +20,10 @@
       </div>
     </div>
     <div class="col">
-      <div class="container" id="formwrapper">
-        <h1>LOGIN</h1>
-        <div class="error">{{form.non_field_errors}}</div>
-        <form method="post">
-          {% csrf_token %}
-          <div class="col">
-            <div class="form">
-              {% for field in form %}
-              <div class="field">
-                <div class="label">{{ field.label }}:</div>
-                <div class="input">{{ field }}</div>
-              </div>
-              {% endfor %}
-              <input class="btn btn-success" type="submit" value="Submit">
-            </div>
-          </div>
-        </form>
-      </div>
+      {% crispy form %}
     </div>
   </div>
 </div>
 
-<!-- <div class="flex-container">
-  <div class="flex-item" id="welcome">
-    <h1 id="welcome">{{welcome}}</h1>
-    <h2>{{description}}</h2>
-  </div>
-  <div class="flex-item" id="formarea">
-    <h1>Login</h1>
-    <form method="post" action="/your-name/">
-      {% csrf_token %}
-      {{ form.as_p }}
-    </form>
-  </div>
-</div> -->
+
 {%endblock%}
