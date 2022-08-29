@@ -8,12 +8,15 @@
 <div class="center">
   <div class="column">
     <div>
-      <h1>HOME</h1>
+      <h1>{{user.username}}'s</h1>
+      <h1>Work Room</h1>
     </div>
-    <div class="grid">
-      {% for label in buttonLabels %}
-      <button class="button">{{label}}</button>
-      {% endfor %}
+    <div class="container">
+      <div class="grid">
+        {% for label in buttonLabels %}
+        <button class="button">{{label}}</button>
+        {% endfor %}
+      </div>
     </div>
 
     <!-- <div class="flexitem">

@@ -1,17 +1,38 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Submit, MultiField,Div,Column,Field,HTML
 from crispy_forms.bootstrap import StrictButton
-from .models import User
 from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
+from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth import get_user_model
+from .validators import validate_username
+from django.utils.translation import gettext as _
+import logging
+logger=logging.getLogger('myLogger')
+from .models import User
 
 # LAYOUT FIELDS IN COLUMNAR FASHION INSIDE CONTAINER
 class FieldsLayout(Layout):
     def __init__(self, *args, **kwargs):
         super().__init__(
             Div(
-            HTML('{{form.non_field_errors}}'),
+            HTML('''
+            {% if form.errors %}
+            <strong>Please correct the following:</strong>
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <div>*{{error|escape}}</div>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <div>*{{error|escape}}</div>
+                {% endfor %}
+            {% endif %}
+
+            '''),
             css_class="error"
             ),
             HTML("""
@@ -23,20 +44,24 @@ class FieldsLayout(Layout):
             {% endfor %}
             """),
         )
-class RegistrationForm(forms.Form):
+class RegistrationForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields =[ 'username', 'email', 'password1','password2']
     username = forms.CharField(
         required = True,
-        widget=forms.TextInput(attrs={'class' : 'input'}),
+        widget=forms.TextInput(attrs={'class' : 'input'})
     )
     email = forms.EmailField(
         required = True,
         widget=forms.TextInput(attrs={'class' : 'input'})
     )
-    password = forms.CharField(
+    password1 = forms.CharField(
         widget=forms.PasswordInput(attrs={'class' : 'input'}),
+        label= "Password",
         required = True,
     )
-    confirmpassword = forms.CharField(
+    password2= forms.CharField(
         required = True,
         label = "Confirm Password",
         widget=forms.PasswordInput(attrs={'class' : 'input'}),
@@ -61,24 +86,28 @@ class RegistrationForm(forms.Form):
     # REGISTRATION VALIDATION
     def clean(self):
         cleaned_data = super(RegistrationForm, self).clean()
-        password = cleaned_data.get('password')
-        confirmpassword = cleaned_data.get('confirmpassword')
         username = cleaned_data.get('username')
-        if User.objects.filter(username=username).exists():
+        email = cleaned_data.get('email')
+        password = cleaned_data.get('password1')
+        confirmpassword = cleaned_data.get('password2')
+        validate_username(username)
+        validate_email(email)
+        validate_password(password)
+        if User.objects.filter(email=email).exists():
             raise ValidationError(
-            ("Username %(username)s already exists"), params={'username':username})
+            _("Account with email address %(email)s already exists"), params={'email':email})
         if password != confirmpassword:
             raise ValidationError(
-                ("Error, passwords don't match")
+                _("Error, passwords don't match")
             )
         return cleaned_data
 
-class UserLoginForm(forms.ModelForm):
+class UserLoginForm(forms.Form):
     class Meta:
         model = User
-        fields = ['username', 'password']
-    username = forms.CharField(
-            # label = "username",
+        fields = ['email', 'password']
+    id = forms.CharField(
+        label = "Username/Email",
         required = True,
         widget=forms.TextInput(attrs={'class' : 'input'}),
     )
@@ -95,7 +124,6 @@ class UserLoginForm(forms.ModelForm):
         self.helper.layout = Layout(
             Div(
                 HTML('<h1>LOGIN</h1>'),
-
                 Div(
                     FieldsLayout(),
                     css_class="col"
@@ -108,13 +136,21 @@ class UserLoginForm(forms.ModelForm):
 
 
     def clean(self):
-        cleaned_data = super(UserLoginForm, self).clean()
-        username = cleaned_data.get('username')
+        cleaned_data = super().clean()
+        # id can either be EMAIL or USERNAME
+        id = cleaned_data.get('id')
         password = cleaned_data.get('password')
-        user = authenticate(username=username, password=password)
-        if user is None:
+        logger.error(id)
+        logger.error(password)
+        user1 = authenticate(email=id, password=password)
+        logger.error(user1)
+        logger.error(id)
+        user2 = authenticate(username=id, password=password)
+        logger.error(user2)
+
+        if (user1 is None) and (user2 is None):
             raise ValidationError(
-                "Error, invalid username/password combination"
+                _("Error, invalid username/password combination")
             )
         return cleaned_data
 
@@ -135,11 +171,15 @@ class EmailForm(forms.Form):
             Div(
                 HTML('<h1>CONTACT</h1>'),
                 Div(
+                    Div(
+                        HTML('{{formDescription}}'),
+                        css_class="description"
+                    ),
                     FieldsLayout(),
                     css_class="col"
                 ),
             Submit('submit', 'Submit', css_class="btn btn-success"),
             css_class="container",
-            css_id="contact"
-            )
+            css_id="contact",
+            ),
         )

@@ -92,12 +92,8 @@ body{
 }
 .error{
   color:FireBrick;
-  /* padding-left: 200px;
-  padding-right:225px; */
-  /* border: 1px solid firebrick; */
-  /* justify-content:center;
-  align-items: center;
-  text-align: center; */
+  border-color: lightblue;
+
 }
 img {
     max-width: 100%;
@@ -165,4 +161,8 @@ img {
 }
 .griditem{
   background-color: cornflowerblue;
+}
+.description{
+  padding-left:20px;
+  padding-right:20px;
 }

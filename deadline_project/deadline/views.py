@@ -8,12 +8,7 @@ from django.conf import settings
 
 from django.contrib.auth import authenticate, login, logout
 import logging
-logging.basicConfig(level=logging.INFO) # Here
-logging.debug("Log message goes here.")
-logging.info("Log message goes here.")
-logging.warning("Log message goes here.")
-logging.error("Log message goes here.")
-logging.critical("Log message goes here.")
+logger=logging.getLogger('myLogger')
 # Create your views here.
 welcome = "Welcome to DEADLINE"
 sitetitle = "DEADLINE"
@@ -23,13 +18,24 @@ def landing(request):
     if request.method =='POST':
         form = UserLoginForm(request.POST)
         if form.is_valid():
-            user = authenticate(request, username=form.cleaned_data['username'], password=form.cleaned_data['password'])
-            if user is not None:
-                login(request,user)
-                return redirect(home, username=user.username)
+            user1 = authenticate(request, email=form.cleaned_data['id'], password=form.cleaned_data['password'])
+            user2 = authenticate(request, username=form.cleaned_data['id'], password=form.cleaned_data['password'])
+            logger.error('user')
+            logger.error(user1)
+            logger.error(user2)
+            if user1 is not None:
+                login(request,user1)
+                return redirect(home, pk=user1.pk)
+            elif user2 is not None:
+                login(request, user2)
+                return redirect(home,pk=user2.pk)
+
 
     else:
         form = UserLoginForm()
+
+
+
     context = {
      'welcome':welcome, 'description':description, 'form':form, 'navlist':landingNavs, 'sitetitle' :sitetitle,
     }
@@ -39,7 +45,9 @@ def register(request):
     if request.method =='POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            return HttpResponseRedirect('/username/')
+            form.save()
+            # logger.error("the password" + form.cleaned_data['password'])
+            return redirect(landing)
     else:
         form = RegistrationForm()
 
@@ -72,6 +80,8 @@ def about(request):
     return render(request, "deadline/about.html", context)
 
 def contact(request):
+    formDescription = """Please leave send any comments/tips/inquiries through this form. Don't forget to leave contact info
+    if you'd like me to get back to you"""
     if request.method =='POST':
         form = EmailForm(request.POST)
         if form.is_valid():
@@ -84,11 +94,11 @@ def contact(request):
     else:
         form = EmailForm()
     context = {
-        'sitetitle':sitetitle, 'navlist':landingNavs, 'form':form
+        'sitetitle':sitetitle, 'navlist':landingNavs, 'form':form, 'formDescription':formDescription
     }
     return render(request, "deadline/contact.html", context)
 
-def home(request, username):
+def home(request, pk):
     navlist = {'Logout': 'logout'}
     buttonLabels = ['Create Course', 'Create Appointment', "My Courses"]
     context = {'navlist':navlist, 'sitetitle':sitetitle, 'buttonLabels':buttonLabels}
