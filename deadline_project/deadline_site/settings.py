@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 from decouple import config
+from django.contrib import messages
 
 import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -154,7 +155,14 @@ LOGGING = {
         'level': 'WARNING',
     },
 }
-
+MESSAGE_TAGS = {
+        messages.DEBUG: 'alert-secondary',
+        messages.INFO: 'alert-info',
+        messages.SUCCESS: 'alert-success',
+        messages.WARNING: 'alert-warning',
+        messages.ERROR: 'alert-danger',
+ }
+TEST_PASSWORD = config('TEST_PASSWORD')
 EMAIL_BACKEND = config('EMAIL_BACKEND')
 EMAIL_HOST= config('EMAIL_HOST')
 EMAIL_PORT = config('EMAIL_PORT')

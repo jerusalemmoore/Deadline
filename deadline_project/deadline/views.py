@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.core.mail import send_mail
 from django.conf import settings
-
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 import logging
 logger=logging.getLogger('myLogger')
@@ -47,6 +47,8 @@ def register(request):
         if form.is_valid():
             form.save()
             # logger.error("the password" + form.cleaned_data['password'])
+            messages.success(request, 'Registration Successful')
+
             return redirect(landing)
     else:
         form = RegistrationForm()
@@ -80,7 +82,7 @@ def about(request):
     return render(request, "deadline/about.html", context)
 
 def contact(request):
-    formDescription = """Please leave send any comments/tips/inquiries through this form. Don't forget to leave contact info
+    formDescription = """Please leave any comments/tips/inquiries through this form. Don't forget to leave contact info
     if you'd like me to get back to you"""
     if request.method =='POST':
         form = EmailForm(request.POST)
@@ -91,6 +93,9 @@ def contact(request):
                 None,
                 [settings.DEFAULT_RECIPIENT],
             )
+            messages.success(request, 'Submission successful')
+            form = EmailForm()
+
     else:
         form = EmailForm()
     context = {

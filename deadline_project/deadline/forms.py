@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import get_user_model
-from .validators import validate_username
+# from .validators import validate_username
 from django.utils.translation import gettext as _
 import logging
 logger=logging.getLogger('myLogger')
@@ -50,16 +50,20 @@ class RegistrationForm(UserCreationForm):
         fields =[ 'username', 'email', 'password1','password2']
     username = forms.CharField(
         required = True,
-        widget=forms.TextInput(attrs={'class' : 'input'})
+        widget=forms.TextInput(attrs={'class' : 'input'}),
+        max_length=User._meta.get_field('username').max_length
+
     )
     email = forms.EmailField(
         required = True,
+        max_length=User._meta.get_field('email').max_length,
         widget=forms.TextInput(attrs={'class' : 'input'})
     )
     password1 = forms.CharField(
         widget=forms.PasswordInput(attrs={'class' : 'input'}),
         label= "Password",
         required = True,
+        max_length=User._meta.get_field('password').max_length
     )
     password2= forms.CharField(
         required = True,
@@ -90,7 +94,7 @@ class RegistrationForm(UserCreationForm):
         email = cleaned_data.get('email')
         password = cleaned_data.get('password1')
         confirmpassword = cleaned_data.get('password2')
-        validate_username(username)
+        # validate_username(username)
         validate_email(email)
         validate_password(password)
         if User.objects.filter(email=email).exists():
